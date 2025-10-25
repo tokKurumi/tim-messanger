@@ -14,6 +14,7 @@ RUN mkdir -p bin && cd bin && cmake .. && make && ls -l
 FROM alpine:3.22.1
 
 WORKDIR /app
+
 RUN apk add --no-cache \
         libstdc++ \
         libgcc \

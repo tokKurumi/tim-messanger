@@ -14,6 +14,16 @@ RUN mkdir -p bin && cd bin && cmake .. && make && ls -l
 FROM alpine:3.22.1
 
 WORKDIR /app
+
+RUN apk add --no-cache \
+        libstdc++ \
+        libgcc \
+        sqlite-libs \
+        openssl \
+        libmosquitto \
+        ca-certificates \
+    && update-ca-certificates || true
+
 COPY --from=build /app/bin/users.service /app/users.service
 
 CMD ["./users.service"]
