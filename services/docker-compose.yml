@@ -2,3 +2,7 @@ services:
   users.service:
     build: ./users.service/src
     container_name: users_service
+
+  auth.service:
+    build: ./auth.service/src
+    container_name: auth_service
