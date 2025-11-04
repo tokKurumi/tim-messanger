@@ -11,6 +11,7 @@ All services are containerized and deployable via Docker Swarm.
 # Language and technology stack
 - Language: C++20
 - Build system: CMake
+- Package manager: Conan 2.x
 - Concurrency: asynchronous, event-driven, multi-threaded
 - Communication:
   - Internal: MQTT (async, pub/sub)
@@ -26,6 +27,73 @@ All services are containerized and deployable via Docker Swarm.
 - Minimal dependencies
 - Pimpl idiom for all public interfaces
 - Repository pattern for data access
+
+# Package management with Conan
+- **Conan 2.x** is used for all external C++ dependencies
+- Each microservice has its own `conanfile.txt` or `conanfile.py`
+- All external libraries (Boost, SQLite3, spdlog, etc.) are managed via Conan
+- No system-wide library installations required
+- Conan integration with CMake via `cmake_find_package` or `CMakeDeps` generator
+
+## Conan workflow
+1. Define dependencies in `conanfile.txt`:
+```ini
+   [requires]
+   boost/1.84.0
+   sqlite3/3.45.0
+   spdlog/1.13.0
+   mosquitto/2.0.18
+
+   [generators]
+   CMakeDeps
+   CMakeToolchain
+
+   [options]
+   boost:shared=False
+```
+
+2. Install dependencies:
+```bash
+   conan install . --output-folder=bin --build=missing
+```
+
+3. Build with CMake using Conan-generated toolchain:
+```bash
+   cd bin
+   cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+   cmake --build .
+```
+
+## Docker integration
+- Conan is installed in the build stage of each Dockerfile
+- Dependencies are installed during Docker build
+- Conan cache can be mounted as a volume to speed up builds
+- Example Dockerfile pattern:
+```dockerfile
+  FROM alpine:latest AS build
+  RUN apk add --no-cache python3 py3-pip cmake build-base
+  RUN pip3 install conan
+  COPY conanfile.txt /app/
+  WORKDIR /app
+  RUN conan install . --output-folder=bin --build=missing
+  COPY . /app/
+  RUN cd bin && cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake && make
+```
+
+## Conan profiles
+- Use Conan profiles for different build configurations
+- Default profile for Linux/GCC builds
+- Custom profiles for cross-compilation if needed
+- Profile example:
+```ini
+  [settings]
+  os=Linux
+  arch=x86_64
+  compiler=gcc
+  compiler.version=13
+  compiler.libcxx=libstdc++11
+  build_type=Release
+```
 
 # Distributed system principles
 - All microservices (except Redis and broker) are stateless
