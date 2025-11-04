@@ -40,7 +40,7 @@ COPY . .
 RUN cmake -S . -B build \
     -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_EXE_LINKER_FLAGS="-static-libstdc++ -static-libgcc" \
+    -DCMAKE_EXE_LINKER_FLAGS="-static-libstdc++ -static-libgcc -static" \
     && cmake --build build --config Release
 
 # Stage 2: final image
