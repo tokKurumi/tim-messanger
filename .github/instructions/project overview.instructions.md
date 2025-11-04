@@ -33,51 +33,54 @@ All services are containerized and deployable via Docker Swarm.
 - Each microservice has its own `conanfile.txt` or `conanfile.py`
 - All external libraries (Boost, SQLite3, spdlog, etc.) are managed via Conan
 - No system-wide library installations required
-- Conan integration with CMake via `cmake_find_package` or `CMakeDeps` generator
+- Conan integration with CMake via `CMakeDeps` and `CMakeToolchain` generators
 
 ## Conan workflow
 1. Define dependencies in `conanfile.txt`:
 ```ini
    [requires]
-   boost/1.84.0
-   sqlite3/3.45.0
-   spdlog/1.13.0
-   mosquitto/2.0.18
+   boost/1.89.0
 
    [generators]
    CMakeDeps
    CMakeToolchain
 
-   [options]
-   boost:shared=False
+   [layout]
+   cmake_layout
 ```
 
 2. Install dependencies:
 ```bash
-   conan install . --output-folder=bin --build=missing
+   conan install . --build=missing -s compiler.libcxx=libstdc++11
 ```
 
-3. Build with CMake using Conan-generated toolchain:
+3. Build with CMake using Conan toolchain:
 ```bash
-   cd bin
-   cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-   cmake --build .
+   cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+   cmake --build build --config Release
 ```
 
 ## Docker integration
-- Conan is installed in the build stage of each Dockerfile
+- Conan is installed in a Python virtual environment during Docker build
 - Dependencies are installed during Docker build
 - Conan cache can be mounted as a volume to speed up builds
 - Example Dockerfile pattern:
 ```dockerfile
-  FROM alpine:latest AS build
-  RUN apk add --no-cache python3 py3-pip cmake build-base
-  RUN pip3 install conan
-  COPY conanfile.txt /app/
+  FROM debian:bookworm-slim AS build
+  RUN apt update && apt install -y --no-install-recommends \
+      build-essential make cmake git python3 python3-venv python3-pip ca-certificates \
+      && rm -rf /var/lib/apt/lists/*
+  RUN python3 -m venv /opt/conan-venv \
+      && /opt/conan-venv/bin/pip install --no-cache-dir --upgrade pip \
+      && /opt/conan-venv/bin/pip install --no-cache-dir conan \
+      && ln -s /opt/conan-venv/bin/conan /usr/local/bin/conan
+  RUN conan profile detect --force
   WORKDIR /app
-  RUN conan install . --output-folder=bin --build=missing
-  COPY . /app/
-  RUN cd bin && cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake && make
+  COPY conanfile.txt CMakeLists.txt ./
+  RUN conan install . --build=missing -s compiler.libcxx=libstdc++11 -g CMakeToolchain -g CMakeDeps
+  COPY . .
+  RUN cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release \
+      && cmake --build build --config Release
 ```
 
 ## Conan profiles
@@ -90,7 +93,7 @@ All services are containerized and deployable via Docker Swarm.
   os=Linux
   arch=x86_64
   compiler=gcc
-  compiler.version=13
+  compiler.version=15
   compiler.libcxx=libstdc++11
   build_type=Release
 ```
