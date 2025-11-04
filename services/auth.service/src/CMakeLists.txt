@@ -7,8 +7,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXE_LINKER_FLAGS "-static-libstdc++ -static-libgcc")
 
+find_package(Boost REQUIRED COMPONENTS json)
+
 add_executable(auth.service
     main.cpp
 )
+
+target_link_libraries(auth.service Boost::json)
 
 target_link_options(auth.service PRIVATE -static-libstdc++ -static-libgcc)
