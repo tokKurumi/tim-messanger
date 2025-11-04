@@ -49,7 +49,7 @@ FROM alpine:3.22.1
 WORKDIR /app
 
 # Support for CA certificates
-RUN apk add --no-cache ca-certificates && update-ca-certificates || true
+RUN apk add --no-cache ca-certificates && update-ca-certificates
 
 COPY --from=build /app/build/auth.service /app/auth.service
 
