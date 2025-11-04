@@ -1,0 +1,9 @@
+bin/
+build/
+.git/
+.gitignore
+*.md
+.vscode/
+install.sh
+build.sh
+CMakeUserPresets.json
