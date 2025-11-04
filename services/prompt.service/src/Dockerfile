@@ -55,6 +55,12 @@ COPY --from=build /app/build/prompt.service /app/prompt.service
 
 RUN chmod +x /app/prompt.service
 
+# Default environment for runtime configuration (can be overridden at docker run)
+ENV PROMPT_BIND_ADDR=0.0.0.0 \
+    PROMPT_BIND_PORT=22 \
+    PROMPT_THREADS=4 \
+    PROMPT_SSH_HOST_PUBLIC_KEY=""
+
 EXPOSE 22
 
 CMD ["./prompt.service"]

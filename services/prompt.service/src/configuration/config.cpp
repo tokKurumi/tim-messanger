@@ -1,0 +1,59 @@
+#include "configuration/config.h"
+
+#include <cstdlib>
+#include <stdexcept>
+
+#include <boost/lexical_cast.hpp>
+
+AppConfig load_config_from_env()
+{
+    AppConfig cfg{};
+
+    if (const char *address = std::getenv("PROMPT_BIND_ADDR"))
+    {
+        if (*address)
+        {
+            cfg.ssh.bind_addr = address;
+        }
+    }
+
+    if (const char *port_str = std::getenv("PROMPT_BIND_PORT"))
+    {
+        try
+        {
+            auto p = boost::lexical_cast<long>(port_str);
+            if (p >= 0 && p <= 65535)
+            {
+                cfg.ssh.bind_port = static_cast<std::uint16_t>(p);
+            }
+        }
+        catch (const boost::bad_lexical_cast &)
+        {
+        }
+    }
+
+    if (const char *pub = std::getenv("PROMPT_SSH_HOST_PUBLIC_KEY"))
+    {
+        if (*pub)
+        {
+            cfg.ssh.host_public_key = pub;
+        }
+    }
+
+    if (const char *threads_str = std::getenv("PROMPT_THREADS"))
+    {
+        try
+        {
+            auto n = boost::lexical_cast<int>(threads_str);
+            if (n > 0)
+            {
+                cfg.pool.threads = n;
+            }
+        }
+        catch (const boost::bad_lexical_cast &)
+        {
+        }
+    }
+
+    return cfg;
+}

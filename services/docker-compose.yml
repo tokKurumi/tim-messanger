@@ -6,3 +6,14 @@ services:
   auth.service:
     build: ./auth.service/src
     container_name: auth_service
+
+  prompt.service:
+    build: ./prompt.service/src
+    container_name: prompt_service
+    environment:
+      - PROMPT_BIND_ADDR=0.0.0.0
+      - PROMPT_BIND_PORT=22
+      - PROMPT_SSH_HOST_PUBLIC_KEY=AAAAC3NzaC1lZDI1NTE5AAAAIJmVx9k2q7h1s0QY2VZs8K1y4a7pXy2o0YtJfH5qTn1
+      - PROMPT_THREADS=4
+    ports:
+      - "2222:22"
