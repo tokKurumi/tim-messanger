@@ -5,7 +5,7 @@ applyTo: '**'
 This repository implements a distributed, server-side TUI messenger accessible via SSH.
 The system consists of stateless C++20 microservices communicating asynchronously via MQTT.
 The server-side TUI frontend communicates with broker via MQTT.
-Authentication is based on SSH keys, and JWT is used for identity and claims propagation.
+Authentication is handled by a dedicated auth-service using username/password (or username+token), and JWT is used for identity and claims propagation between services.
 All services are containerized and deployable via Docker Swarm.
 
 # Language and technology stack
@@ -17,12 +17,12 @@ All services are containerized and deployable via Docker Swarm.
   - Internal: MQTT (async, pub/sub)
   - External: SSH (client → TUI frontend)
 - Database: SQLite (local per service)
-- Session store: Redis (JWT, TTL 15 minutes)
 - Logging: spdlog
 - Allowed libraries:
   - Boost (Asio, Beast, Thread, Filesystem)
   - SQLite3
   - libmosquitto
+  - libssh (server-side SSH)
   - ftxui / ncurses (TUI)
 - Minimal dependencies
 - Pimpl idiom for all public interfaces
@@ -99,7 +99,7 @@ All services are containerized and deployable via Docker Swarm.
 ```
 
 # Distributed system principles
-- All microservices (except Redis and broker) are stateless
+- All microservices (except the MQTT broker) are stateless
 - Idempotent operations required:
   - Repeated requests do not change system state beyond first application
   - Retry-safe network calls, DB operations, message delivery
@@ -113,20 +113,28 @@ All services are containerized and deployable via Docker Swarm.
 
 # Microservices overview
 
-## 1. auth-service
-- SSH key authentication
-- JWT issuance and validation
-- JWT stored in Redis with TTL 15 minutes
-- Stateless except Redis storage
-- Idempotent login operations
+## 1. prompt.service (entry point)
+- SSH-based entrypoint for end-users (default: port 2222)
+- Accepts SSH connections like: `ssh -p 2222 <username>@<host>`; collects username and password (or token)
+- Sends credentials to auth-service via MQTT for verification
+- On success: greets user (e.g., `hello <user>!`) and provides minimal TUI commands
+- Stateless by design; does not use system key storage (ephemeral host key for MVP, later persistent shared key across multiple instances)
+- Concurrency: Boost.Asio powered worker pool; accepts multiple SSH sessions concurrently
+- Idempotent command handling
 
-## 2. user-service
+## 2. auth.service
+- Validates username/password (or username+token) requests coming from prompt.service via MQTT
+- Issues JWT on success; JWT is used for calling other microservices
+- Stateless (no Redis); JWT validation is done via shared signing keys
+- Idempotent authentication flow
+
+## 3. user.service
 - Manages user profile data (non-sensitive)
 - Requires valid JWT
 - Stateless, async, multi-threaded
 - Idempotent updates
 
-## 3. topic-service
+## 4. topic.service
 - Business entity: Topic
   - Each user can create a topic
   - Topic has a name, slogan (moto), participants
@@ -137,38 +145,15 @@ All services are containerized and deployable via Docker Swarm.
 - Idempotent message handling
 - MQTT message payload includes JWT, request data, idempotency key
 
-## 5. tui-frontend (server-side)
-- SSH-based terminal UI (server-side)
-- Communicates with MQTT broker
-- Listens for events via MQTT topic subscription
-- **Redis-backed session store**:
-  - JWT for each user stored in Redis with TTL 15 minutes
-  - Any frontend replica can validate JWT and serve SSH client
-  - No sticky session required
-- Asynchronous input, rendering, network events
-- Idempotent command execution
-- Minimal TUI commands (MVP):
-  - `/send-message <topic> <message>`
-  - `/change-moto <text>` (only if owner)
-  - `/list-topics`
-  - `/list-users`
-- Future: replace MVP commands with full-featured, graphical server-side TUI interface
-
-## 6. *.migrator microservices
-- Standalone CLI for schema migrations
-- Fully asynchronous
-- Supports `up`, `down`, `to <version>`, `status`
-- Idempotent operations
-
-# Redis for server-side frontend scaling
-- Server-side frontend requires state (JWT) per SSH session
-- Redis acts as shared session store
-- Mechanism:
-  1. Auth-service validates SSH key, generates JWT, stores in Redis: `SETEX jwt:<user_id> 900 <signed_jwt>`
-  2. TUI frontend replica retrieves JWT from Redis to validate session
-  3. Multiple replicas can serve the same SSH client, reading JWT from Redis
-  4. TTL ensures tokens expire automatically; active sessions can refresh TTL
-- Result: frontend can be horizontally scaled, user experience remains seamless, no manual token management
+## 5. migrator.service (universal)
+- Standalone CLI for schema migrations, reused per microservice
+- Supports bidirectional migrations: `up`, `down`, `to <version>`, `status`
+- Conventions:
+  - A folder with SQL migrations scripts
+  - Each version has two scripts: `<version>_up.sql` and `<version>_down.sql`
+  - A config maps versions and ordering
+- Fully asynchronous; idempotent operations
+- For each microservice use its own instance of migrator with its own DB (connection) and migration scripts, so that migrations are isolated.
 
 # Internal communication (microservice-to-microservice)
 - **MQTT**: async pub/sub for commands and events
@@ -178,39 +163,54 @@ All services are containerized and deployable via Docker Swarm.
   - Idempotency key
 
 # External communication (client → system)
-- **SSH**: only channel for connecting to server-side TUI
+- **SSH**: only channel for connecting to the system via prompt.service (default: port 2222)
+- Login flow: username/password (or token) captured in SSH session → verified by auth.service via MQTT → on success, TUI greets the user
 - TUI commands (MVP): `/send-message`, `/change-moto`, `/list-topics`, `/list-users`
 
 # Fault-tolerance and resilience
 - Services detect and recover from transient failures
 - MQTT broker failures: retry connections, idempotent message handling
-- Redis downtime: optionally fallback to re-authentication
-- SSH client disconnections: can reconnect and resume session using Redis-backed JWT
+- SSH client disconnections: clients can reconnect; JWT is stateless and can be revalidated
 - Database writes are transactional
 
 # Deployment
 - Each service containerized separately
 - Docker Swarm stack:
-  - auth-service + migrator
-  - user-service + migrator
-  - topic-service + migrator
-  - tui-frontend (replicable)
+  - prompt.service + migrator
+  - auth.service + migrator
+  - user.service + migrator
+  - topic.service + migrator
   - MQTT broker
-  - Redis
 - Volumes for SQLite persistence
 - Secrets for JWT keys
 
 # C++ design rules
 - Layers: API, core logic, repository, MQTT
 - Async via Boost.Asio (coroutines or handler-based)
-- HTTP via Boost.Beast
+- HTTP via Boost.Beast (if needed, prefer MQTT for inter-service communication)
 - Thread pools configurable
 - Pimpl pattern for all public classes
 - Error handling mandatory; all operations idempotent
 - Graceful shutdown via signals
 - Non-blocking logging via spdlog
 
+## Code organization and structure
+- All source code for each microservice must reside strictly under its `src/` directory.
+- Keep code well-structured and class-oriented; favor small, cohesive classes with clear responsibilities (SRP).
+- Reuse internal services/components where practical to avoid duplication; prefer composition over inheritance.
+- Apply the repository pattern for all database access; business logic and transport layers must never talk to the DB directly.
+- Maintain clean internal boundaries between layers (API ↔ core ↔ repository ↔ transport/MQTT/SSH).
+- Public interfaces use Pimpl; internal headers stay inside `src/` with minimal exposure.
+- Prefer consistent module folders under `src/` (suggested):
+  - `src/api/` – DTOs, request/response contracts
+  - `src/core/` – domain services, use-cases, business rules
+  - `src/repository/` – repositories, mappers, SQL
+  - `src/mqtt/` – MQTT client, topics, serializers
+  - `src/ssh/` – SSH server(frontend) pieces where applicable
+  - `src/utils/` – small shared helpers (keep minimal)
+- Keep functions small, pure where possible, and testable; avoid side effects leaking across layers.
+
 # Non-goals
 - No Telnet or plaintext protocols
 - No monolithic or synchronous services
-- No global shared state outside Redis and MQTT
+- No global shared state outside MQTT
