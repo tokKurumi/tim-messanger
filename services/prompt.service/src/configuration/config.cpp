@@ -1,9 +1,9 @@
-#include "configuration/config.h"
-
 #include <cstdlib>
 #include <stdexcept>
 
 #include <boost/lexical_cast.hpp>
+
+#include "configuration/config.h"
 
 AppConfig load_config_from_env()
 {

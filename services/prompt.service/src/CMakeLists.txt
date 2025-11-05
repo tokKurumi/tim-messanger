@@ -20,12 +20,13 @@ target_include_directories(prompt.service PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(prompt.service boost::boost)
-target_link_libraries(prompt.service ssh::ssh)
+target_link_libraries(prompt.service PRIVATE
+    Boost::boost
+    ssh::ssh
+)
 
 target_link_options(prompt.service PRIVATE
     -static-libstdc++
     -static-libgcc
     -static
-    -Wl,--allow-multiple-definition
 )

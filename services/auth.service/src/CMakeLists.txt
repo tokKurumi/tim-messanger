@@ -18,11 +18,12 @@ target_include_directories(auth.service PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(auth.service boost::boost)
+target_link_libraries(auth.service
+    boost::boost
+)
 
 target_link_options(auth.service PRIVATE
     -static-libstdc++
     -static-libgcc
     -static
-    -Wl,--allow-multiple-definition
 )
