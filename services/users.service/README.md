@@ -95,7 +95,3 @@ Requests must include a valid JWT; responses follow the project's DTO convention
 
 -   Follow repository pattern in `src/repository/` for any DB access. Keep business logic in `src/core/` and transport/MQTT in `src/mqtt/`.
 -   Prefer asynchronous Boost.Asio patterns used across other services.
-
-```
-
-```
