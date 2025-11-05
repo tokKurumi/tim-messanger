@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.5
 # Stage 1: build
 FROM debian:bookworm-slim AS build
 
@@ -9,6 +10,7 @@ RUN apt update && apt install -y --no-install-recommends \
     python3 \
     python3-venv \
     python3-pip \
+    ccache \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
@@ -26,8 +28,10 @@ WORKDIR /app
 # Copy conanfile first for better caching
 COPY conanfile.txt CMakeLists.txt ./
 
-# Install Conan dependencies
-RUN conan install . \
+# Install Conan dependencies (with cached Conan home). Ensure profile exists inside cache mount.
+RUN --mount=type=cache,target=/root/.conan2 \
+    conan profile detect --force && \
+    conan install . \
     --build=missing \
     -s compiler.libcxx=libstdc++11 \
     -g CMakeToolchain \
@@ -37,9 +41,11 @@ RUN conan install . \
 COPY . .
 
 # Build with CMake using Conan toolchain
-RUN cmake -S . -B build \
+RUN --mount=type=cache,target=/root/.conan2 --mount=type=cache,target=/root/.cache/ccache \
+    cmake -S . -B build \
     -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake \
     -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
     -DCMAKE_EXE_LINKER_FLAGS="-static-libstdc++ -static-libgcc -static" \
     && cmake --build build --config Release
 
