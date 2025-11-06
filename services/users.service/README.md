@@ -34,11 +34,7 @@ The project uses Conan to manage external dependencies. From the `src/` director
 ```bash
 # From src/ directory
 
-conan install . \
-    --build=missing \
-    -s compiler.libcxx=libstdc++11 \
-    -g CMakeToolchain \
-    -g CMakeDeps
+sh ./install.sh
 ```
 
 This command:
@@ -53,10 +49,7 @@ After installing dependencies, build the project:
 ```bash
 # From src/ directory
 
-cmake -S . -B build \
-    -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake \
-    -DCMAKE_BUILD_TYPE=Release \
-    && cmake --build build --config Release
+sh ./build.sh
 ```
 
 This will create the `users.service` binary under `src/build/` (or similar build output configured in CMake).
