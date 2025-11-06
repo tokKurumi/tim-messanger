@@ -51,9 +51,10 @@ FROM alpine:3.22.1
 
 WORKDIR /app
 
-# Support for CA certificates
-RUN apk add --no-cache ca-certificates && update-ca-certificates
+# Support for CA certificates and necessary C++ runtime libraries
+RUN apk add --no-cache ca-certificates libstdc++ libgcc && update-ca-certificates
 
+# Copy the built binary
 COPY --from=build /app/build/auth.service /app/auth.service
 
 RUN chmod +x /app/auth.service
