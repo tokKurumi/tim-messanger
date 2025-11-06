@@ -1,27 +1,25 @@
 # syntax=docker/dockerfile:1.5
 # Stage 1: build
-FROM debian:bookworm-slim AS build
+FROM alpine:3.22.1 AS build
 
-RUN apt update && apt install -y --no-install-recommends \
-    build-essential \
+RUN apk add --no-cache \
+    build-base \
+    linux-headers \
+    perl \
     make \
     cmake \
     git \
     python3 \
-    python3-venv \
-    python3-pip \
+    py3-virtualenv \
+    py3-pip \
     ccache \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+    ca-certificates
 
 # Install Conan in Python virtual environment
 RUN python3 -m venv /opt/conan-venv \
     && /opt/conan-venv/bin/pip install --no-cache-dir --upgrade pip \
     && /opt/conan-venv/bin/pip install --no-cache-dir conan \
     && ln -s /opt/conan-venv/bin/conan /usr/local/bin/conan
-
-# Create Conan default profile
-RUN conan profile detect --force
 
 WORKDIR /app
 
@@ -33,6 +31,7 @@ RUN --mount=type=cache,target=/root/.conan2 \
     conan profile detect --force && \
     conan install . \
     --build=missing \
+    --build=b2/* \
     -s compiler.libcxx=libstdc++11 \
     -g CMakeToolchain \
     -g CMakeDeps
@@ -46,7 +45,6 @@ RUN --mount=type=cache,target=/root/.conan2 --mount=type=cache,target=/root/.cac
     -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-    -DCMAKE_EXE_LINKER_FLAGS="-static-libstdc++ -static-libgcc -static" \
     && cmake --build build --config Release
 
 # Stage 2: final image
@@ -54,9 +52,10 @@ FROM alpine:3.22.1
 
 WORKDIR /app
 
-# Support for CA certificates
-RUN apk add --no-cache ca-certificates && update-ca-certificates
+# Support for CA certificates and necessary C++ runtime libraries
+RUN apk add --no-cache ca-certificates libstdc++ libgcc && update-ca-certificates
 
+# Copy the built binary
 COPY --from=build /app/build/prompt.service /app/prompt.service
 
 RUN chmod +x /app/prompt.service
