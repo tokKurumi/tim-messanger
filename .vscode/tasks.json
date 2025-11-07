@@ -1,0 +1,53 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build auth.service (Debug)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "${workspaceFolder}/misc/build_service.sh",
+                "debug",
+                "${workspaceFolder}/services/auth.service/src"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build prompt.service (Debug)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "${workspaceFolder}/misc/build_service.sh",
+                "debug",
+                "${workspaceFolder}/services/prompt.service/src"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build users.service (Debug)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "${workspaceFolder}/misc/build_service.sh",
+                "debug",
+                "${workspaceFolder}/services/users.service/src"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
