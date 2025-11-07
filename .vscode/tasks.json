@@ -6,7 +6,7 @@
             "type": "shell",
             "command": "bash",
             "args": [
-                "${workspaceFolder}/misc/build_service.sh",
+                "${workspaceFolder}/misc/build.sh",
                 "debug",
                 "${workspaceFolder}/services/auth.service/src"
             ],
@@ -22,7 +22,7 @@
             "type": "shell",
             "command": "bash",
             "args": [
-                "${workspaceFolder}/misc/build_service.sh",
+                "${workspaceFolder}/misc/build.sh",
                 "debug",
                 "${workspaceFolder}/services/prompt.service/src"
             ],
@@ -38,7 +38,7 @@
             "type": "shell",
             "command": "bash",
             "args": [
-                "${workspaceFolder}/misc/build_service.sh",
+                "${workspaceFolder}/misc/build.sh",
                 "debug",
                 "${workspaceFolder}/services/users.service/src"
             ],

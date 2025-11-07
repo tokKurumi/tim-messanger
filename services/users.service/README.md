@@ -32,7 +32,7 @@ Service that manages user profiles for the distributed TUI messenger. Provides C
 The project uses Conan to manage external dependencies. Run the following command:
 
 ```bash
-sh ./misc/build_service.sh <debug|release> ./services/users.service/src/
+sh ./misc/build.sh <debug|release> ./services/users.service/src/
 ```
 
 This command:

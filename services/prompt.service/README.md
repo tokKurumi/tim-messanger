@@ -37,7 +37,7 @@ SSH-based terminal UI frontend for the distributed TUI messenger. Provides the i
 The project uses Conan to manage external dependencies. Run the following command:
 
 ```bash
-sh ./misc/build_service.sh <debug|release> ./services/prompt.service/src/
+sh ./misc/build.sh <debug|release> ./services/prompt.service/src/
 ```
 
 This command:

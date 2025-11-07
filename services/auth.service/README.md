@@ -27,7 +27,7 @@ Authentication service for the distributed TUI messenger. Validates user credent
 The project uses Conan to manage external dependencies. Run the following command:
 
 ```bash
-sh ./misc/build_service.sh <debug|release> ./services/auth.service/src/
+sh ./misc/build.sh <debug|release> ./services/auth.service/src/
 ```
 
 This command:

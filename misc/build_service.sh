@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# build_service.sh
+# build.sh
 # Unified installer+builder for CMake+Conan C++ services in this repo.
 # 
 # This script automates the complete build workflow:
@@ -13,20 +13,20 @@ set -euo pipefail
 print_usage() {
   cat <<'EOF'
 Usage:
-  build_service.sh <debug|release> <source_dir>
+  build.sh <debug|release> <source_dir>
 
 Positional args:
   <debug|release>   Build type. Only these two are supported. Case-insensitive.
   <source_dir>      Path to directory that contains CMakeLists.txt and conanfile.txt
 
 Examples:
-  sh misc/build_service.sh debug services/auth.service/src
-  sh misc/build_service.sh release ./services/prompt.service/src
+  sh misc/build.sh debug services/auth.service/src
+  sh misc/build.sh release ./services/prompt.service/src
 EOF
 }
 
-err() { echo "[build_service] ERROR: $*" >&2; }
-info() { echo "[build_service] $*"; }
+err() { echo "[build] ERROR: $*" >&2; }
+info() { echo "[build] $*"; }
 
 if [[ ${#} -lt 2 ]]; then
   err "Not enough arguments."
