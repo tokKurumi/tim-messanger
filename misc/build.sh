@@ -20,7 +20,7 @@ Positional args:
   <source_dir>      Path to directory that contains CMakeLists.txt and conanfile.txt
 
 Examples:
-  sh misc/build.sh debug services/auth.service/src
+  sh misc/build.sh debug ./services/auth.service/src
   sh misc/build.sh release ./services/prompt.service/src
 EOF
 }
@@ -76,10 +76,10 @@ mkdir -p "${BUILD_DIR}"
 conan profile detect --force >/dev/null 2>&1 || true
 
 # Install Conan dependencies
-info "Installing Conan dependencies (type=${CMAKE_BUILD_TYPE})..."
 # Run conan install with cmake_layout from conanfile.txt.
 # The cmake_layout directive automatically creates: build/${CMAKE_BUILD_TYPE}/generators/
 # We pass the source directory explicitly to avoid changing working directory.
+info "Installing Conan dependencies (type=${CMAKE_BUILD_TYPE})..."
 conan install "${SRC_DIR}" \
   --build=missing \
   -s compiler.libcxx=libstdc++11 \
@@ -105,5 +105,4 @@ cmake -S "${SRC_DIR}" -B "${BUILD_DIR}" \
 # Build the project (compiles sources and links binary)
 info "Building..."
 cmake --build "${BUILD_DIR}" --config "${CMAKE_BUILD_TYPE}"
-
 info "Done. Artifacts are in: ${BUILD_DIR}"
