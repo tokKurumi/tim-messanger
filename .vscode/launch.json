@@ -1,92 +1,92 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Debug auth.service",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "${workspaceFolder}/services/auth.service/src/build/Debug/auth.service",
-      "args": [],
-      "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/services/auth.service/src",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "gdb",
-      "setupCommands": [
+    "version": "0.2.0",
+    "configurations": [
         {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
+            "name": "Debug auth.service",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/services/auth.service/src/build/Debug/auth.service",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/services/auth.service/src",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build auth.service (Debug)",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "logging": {
+                "engineLogging": false
+            }
         },
         {
-          "description": "Set Disassembly Flavor to Intel",
-          "text": "-gdb-set disassembly-flavor intel",
-          "ignoreFailures": true
-        }
-      ],
-      "preLaunchTask": "Build auth.service (Debug)",
-      "miDebuggerPath": "/usr/bin/gdb",
-      "logging": {
-        "engineLogging": false
-      }
-    },
-    {
-      "name": "Debug prompt.service",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "${workspaceFolder}/services/prompt.service/src/build/Debug/prompt.service",
-      "args": [],
-      "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/services/prompt.service/src",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "gdb",
-      "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
+            "name": "Debug prompt.service",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/services/prompt.service/src/build/Debug/prompt.service",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/services/prompt.service/src",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build prompt.service (Debug)",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "logging": {
+                "engineLogging": false
+            }
         },
         {
-          "description": "Set Disassembly Flavor to Intel",
-          "text": "-gdb-set disassembly-flavor intel",
-          "ignoreFailures": true
+            "name": "Debug users.service",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/services/users.service/src/build/Debug/users.service",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/services/users.service/src",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build users.service (Debug)",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "logging": {
+                "engineLogging": false
+            }
         }
-      ],
-      "preLaunchTask": "Build prompt.service (Debug)",
-      "miDebuggerPath": "/usr/bin/gdb",
-      "logging": {
-        "engineLogging": false
-      }
-    },
-    {
-      "name": "Debug users.service",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "${workspaceFolder}/services/users.service/src/build/Debug/users.service",
-      "args": [],
-      "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/services/users.service/src",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "gdb",
-      "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        },
-        {
-          "description": "Set Disassembly Flavor to Intel",
-          "text": "-gdb-set disassembly-flavor intel",
-          "ignoreFailures": true
-        }
-      ],
-      "preLaunchTask": "Build users.service (Debug)",
-      "miDebuggerPath": "/usr/bin/gdb",
-      "logging": {
-        "engineLogging": false
-      }
-    }
-  ]
+    ]
 }
