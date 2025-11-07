@@ -52,8 +52,8 @@ This command:
 Containerized build and run example:
 
 ```bash
-docker build -f ./services/users.service/Dockerfile -t users-service ./services/users.service/src/
-docker run -p 0:0 users-service
+docker build -f ./services/users.service/src/Dockerfile -t users-service ./services/users.service/src/
+docker run users-service
 ```
 
 Adjust the exposed ports and environment variables for MQTT broker URL, database path, and JWT signing keys as required by your deployment.
