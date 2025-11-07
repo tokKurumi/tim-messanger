@@ -22,35 +22,24 @@ Authentication service for the distributed TUI messenger. Validates user credent
         conan profile detect --force
         ```
 
-### Install Dependencies via Conan
+### Install Dependencies & Build
 
-The project uses Conan to manage external dependencies (Boost 1.89.0).
+The project uses Conan to manage external dependencies. Run the following command:
 
 ```bash
-# From src/ directory
-
-sh ./install.sh
+sh ./misc/build_service.sh <debug|release> ./services/auth.service/src/
 ```
 
 This command:
 
 -   Downloads and compiles packages (if not cached)
 -   Generates files for CMake integration (`CMakeDeps`, `CMakeToolchain`)
-
-### Build Project with CMake
-
-After installing dependencies, build the project:
-
-```bash
-# From src/ directory
-
-sh ./build.sh
-```
+-   Creates build binary in `src/build/<Debug|Release>/auth.service`
 
 ### Run
 
 ```bash
-./build/auth.service
+./services/auth.service/src/build/<Debug|Release>/auth.service
 ```
 
 ### Docker
@@ -58,7 +47,7 @@ sh ./build.sh
 For containerized build and run:
 
 ```bash
-docker build -t auth-service .
+docker build -f ./services/auth.service/src/Dockerfile -t auth-service ./services/auth.service/src/
 docker run --rm auth-service
 ```
 

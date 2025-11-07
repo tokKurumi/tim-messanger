@@ -32,45 +32,32 @@ SSH-based terminal UI frontend for the distributed TUI messenger. Provides the i
         conan profile detect --force
         ```
 
-### Install Dependencies via Conan
+### Install Dependencies & Build
 
-The project uses Conan to manage external dependencies
+The project uses Conan to manage external dependencies. Run the following command:
 
 ```bash
-# From src/ directory
-
-sh ./install.sh
+sh ./misc/build_service.sh <debug|release> ./services/prompt.service/src/
 ```
 
 This command:
 
 -   Downloads and compiles packages (if not cached)
 -   Generates files for CMake integration (`CMakeDeps`, `CMakeToolchain`)
-
-### Build Project with CMake
-
-After installing dependencies, build the project:
-
-```bash
-# From src/ directory
-
-sh ./build.sh
-```
+-   Creates build binary in `src/build/<Debug|Release>/prompt.service`
 
 ### Run
 
 ```bash
-./build/prompt.service
+./services/prompt.service/src/build/<Debug|Release>/prompt.service
 ```
-
-The service will start an SSH server (default port 22) and accept connections.
 
 ### Docker
 
 For containerized build and run:
 
 ```bash
-docker build -t prompt-service .
+docker build -f ./services/prompt.service/src/Dockerfile -t prompt-service ./services/prompt.service/src/
 docker run -p 2222:22 prompt-service
 ```
 

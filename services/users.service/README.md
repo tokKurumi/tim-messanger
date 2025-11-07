@@ -27,47 +27,32 @@ Service that manages user profiles for the distributed TUI messenger. Provides C
         conan profile detect --force
         ```
 
-### Install Dependencies via Conan
+### Install Dependencies & Build
 
-The project uses Conan to manage external dependencies. From the `src/` directory run:
+The project uses Conan to manage external dependencies. Run the following command:
 
 ```bash
-# From src/ directory
-
-sh ./install.sh
+sh ./misc/build_service.sh <debug|release> ./services/users.service/src/
 ```
 
 This command:
 
 -   Downloads and compiles packages (if not cached)
 -   Generates files for CMake integration (`CMakeDeps`, `CMakeToolchain`)
-
-### Build Project with CMake
-
-After installing dependencies, build the project:
-
-```bash
-# From src/ directory
-
-sh ./build.sh
-```
-
-This will create the `users.service` binary under `src/build/` (or similar build output configured in CMake).
+-   Creates build binary in `src/build/<Debug|Release>/users.service`
 
 ### Run
 
 ```bash
-./build/users.service
+./services/users.service/src/build/<Debug|Release>/users.service
 ```
-
-The service will start and connect to the MQTT broker as configured in its configuration files. It expects JWT-based requests from other services (for example, `prompt.service` and `topic.service`).
 
 ### Docker
 
 Containerized build and run example:
 
 ```bash
-docker build -t users-service .
+docker build -f ./services/users.service/Dockerfile -t users-service ./services/users.service/src/
 docker run -p 0:0 users-service
 ```
 
