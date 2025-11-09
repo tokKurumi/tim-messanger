@@ -85,5 +85,6 @@
         "valarray": "cpp",
         "variant": "cpp",
         "strstream": "cpp"
-    }
+    },
+    "cmake.ignoreCMakeListsMissing": true
 }
