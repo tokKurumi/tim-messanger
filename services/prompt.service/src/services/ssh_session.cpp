@@ -149,7 +149,43 @@ private:
         if (rc == SSH_OK)
         {
             spdlog::info("SshSession: key exchange completed");
-            // TODO: authentication (password/token) and TUI
+
+            // Send a simple greeting to the client over a session channel.
+            // This is a minimal friendly banner before implementing full
+            // authentication and TUI. If the channel cannot be opened we
+            // continue to shutdown the session.
+            ssh_channel channel = ssh_channel_new(_session);
+            if (channel)
+            {
+                int rc = ssh_channel_open_session(channel);
+                if (rc == SSH_OK)
+                {
+                    const char *msg = "hello\n";
+                    int written = ssh_channel_write(channel, msg, (uint32_t)strlen(msg));
+                    if (written < 0)
+                    {
+                        spdlog::warn("SshSession: failed to write greeting to channel");
+                    }
+                    else
+                    {
+                        spdlog::info("SshSession: sent greeting ({} bytes)", written);
+                    }
+                    // politely close channel
+                    ssh_channel_send_eof(channel);
+                    ssh_channel_close(channel);
+                }
+                else
+                {
+                    spdlog::warn("SshSession: failed to open session channel: rc={}", rc);
+                }
+                ssh_channel_free(channel);
+            }
+            else
+            {
+                spdlog::warn("SshSession: ssh_channel_new() returned nullptr");
+            }
+
+            // TODO: authentication (password/token) and full TUI
             stop();
             return;
         }
