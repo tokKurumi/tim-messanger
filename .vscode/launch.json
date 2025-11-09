@@ -38,7 +38,28 @@
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/services/prompt.service/src",
-            "environment": [],
+            "environment": [
+                {
+                    "name": "PROMPT_BIND_ADDR",
+                    "value": "0.0.0.0"
+                },
+                {
+                    "name": "PROMPT_BIND_PORT",
+                    "value": "2222"
+                },
+                {
+                    "name": "PROMPT_THREADS",
+                    "value": "4"
+                },
+                {
+                    "name": "PROMPT_SSH_RSA_HOST_PUBLIC_KEY_PATH",
+                    "value": "${workspaceFolder}/services/prompt.service/dev-artifacts/host_rsa.pub"
+                },
+                {
+                    "name": "PROMPT_SSH_RSA_HOST_PRIVATE_KEY_PATH",
+                    "value": "${workspaceFolder}/services/prompt.service/dev-artifacts/host_rsa"
+                }
+            ],
             "externalConsole": false,
             "MIMode": "gdb",
             "setupCommands": [
