@@ -14,9 +14,9 @@ struct SshConfig
     // port to bind SSH server
     std::uint16_t bind_port{2222};
 
-    // PROMPT_SSH_HOST_PUBLIC_KEY (optional informational)
-    // persistent host public key (optional, informational)
-    std::string host_public_key;
+    // PROMPT_SSH_RSA_HOST_PUBLIC_KEY_PATH (optional)
+    // path to host public key (optional; used for logging / distribution to clients)
+    std::string rsa_host_public_key_path;
 
     // PROMPT_SSH_RSA_HOST_PRIVATE_KEY_PATH
     // path to RSA private host key file for SSH server

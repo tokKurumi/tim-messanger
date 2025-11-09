@@ -37,11 +37,11 @@ public:
             }
         }
 
-        if (const char *pub = std::getenv("PROMPT_SSH_HOST_PUBLIC_KEY"))
+        if (const char *pub_path = std::getenv("PROMPT_SSH_RSA_HOST_PUBLIC_KEY_PATH"))
         {
-            if (*pub)
+            if (*pub_path)
             {
-                cfg.ssh.host_public_key = pub;
+                cfg.ssh.rsa_host_public_key_path = pub_path;
             }
         }
 

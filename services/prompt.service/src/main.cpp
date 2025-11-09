@@ -20,7 +20,7 @@ int main()
     spdlog::info("Starting prompt.service...");
     spdlog::info("SSH Bind Address: {}", config.ssh.bind_addr);
     spdlog::info("SSH Bind Port: {}", config.ssh.bind_port);
-    spdlog::info("SSH Host Public Key: {}", config.ssh.host_public_key);
+    spdlog::info("SSH Host Public Key Path: {}", config.ssh.rsa_host_public_key_path);
     spdlog::info("SSH Host Key Path: {}", config.ssh.rsa_host_private_key_path);
     spdlog::info("Thread Pool Size: {}", config.pool.threads);
 
