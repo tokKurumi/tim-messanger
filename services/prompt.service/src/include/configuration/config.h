@@ -13,9 +13,14 @@ struct SshConfig
     // port to bind SSH server
     std::uint16_t bind_port{2222};
 
-    // PROMPT_SSH_HOST_PUBLIC_KEY
-    // persistent host public key
+    // PROMPT_SSH_HOST_PUBLIC_KEY (optional informational)
+    // persistent host public key (optional, informational)
     std::string host_public_key;
+
+    // PROMPT_SSH_RSA_HOST_PRIVATE_KEY_PATH
+    // path to RSA private host key file for SSH server
+    // can be set via env var or as docker secret path (e.g., /run/secrets/prompt_ssh_rsa_key)
+    std::string rsa_host_private_key_path;
 };
 
 struct ThreadPoolConfig

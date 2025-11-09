@@ -40,6 +40,14 @@ AppConfig load_config_from_env()
         }
     }
 
+    if (const char *priv_path = std::getenv("PROMPT_SSH_RSA_HOST_PRIVATE_KEY_PATH"))
+    {
+        if (*priv_path)
+        {
+            cfg.ssh.rsa_host_private_key_path = priv_path;
+        }
+    }
+
     if (const char *threads_str = std::getenv("PROMPT_THREADS"))
     {
         try

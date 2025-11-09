@@ -15,5 +15,12 @@ services:
       - PROMPT_BIND_PORT=22
       - PROMPT_SSH_HOST_PUBLIC_KEY=AAAAC3NzaC1lZDI1NTE5AAAAIJmVx9k2q7h1s0QY2VZs8K1y4a7pXy2o0YtJfH5qTn1
       - PROMPT_THREADS=4
+      - PROMPT_SSH_RSA_HOST_PRIVATE_KEY_PATH=/run/secrets/prompt_ssh_rsa_key
     ports:
       - "2222:22"
+    secrets:
+      - prompt_ssh_rsa_key
+
+secrets:
+  prompt_ssh_rsa_key:
+    file: ./prompt.service/src/host_rsa

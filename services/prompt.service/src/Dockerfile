@@ -64,7 +64,8 @@ RUN chmod +x /app/prompt.service
 ENV PROMPT_BIND_ADDR=0.0.0.0 \
     PROMPT_BIND_PORT=22 \
     PROMPT_THREADS=4 \
-    PROMPT_SSH_HOST_PUBLIC_KEY=""
+    PROMPT_SSH_HOST_PUBLIC_KEY="" \
+    PROMPT_SSH_RSA_HOST_PRIVATE_KEY_PATH="/run/secrets/prompt_ssh_rsa_key"
 
 EXPOSE 22
 
