@@ -5,63 +5,73 @@
 
 #include "configuration/config.h"
 
-AppConfig load_config_from_env()
+class ConfigLoader::Impl
 {
-    AppConfig cfg{};
+public:
+    Impl() = default;
 
-    if (const char *address = std::getenv("PROMPT_BIND_ADDR"))
+    AppConfig load()
     {
-        if (*address)
-        {
-            cfg.ssh.bind_addr = address;
-        }
-    }
+        AppConfig cfg{};
 
-    if (const char *port_str = std::getenv("PROMPT_BIND_PORT"))
-    {
-        try
+        if (const char *address = std::getenv("PROMPT_BIND_ADDR"))
         {
-            auto p = boost::lexical_cast<long>(port_str);
-            if (p >= 0 && p <= 65535)
+            if (*address)
             {
-                cfg.ssh.bind_port = static_cast<std::uint16_t>(p);
+                cfg.ssh.bind_addr = address;
             }
         }
-        catch (const boost::bad_lexical_cast &)
-        {
-        }
-    }
 
-    if (const char *pub = std::getenv("PROMPT_SSH_HOST_PUBLIC_KEY"))
-    {
-        if (*pub)
+        if (const char *port_str = std::getenv("PROMPT_BIND_PORT"))
         {
-            cfg.ssh.host_public_key = pub;
-        }
-    }
-
-    if (const char *priv_path = std::getenv("PROMPT_SSH_RSA_HOST_PRIVATE_KEY_PATH"))
-    {
-        if (*priv_path)
-        {
-            cfg.ssh.rsa_host_private_key_path = priv_path;
-        }
-    }
-
-    if (const char *threads_str = std::getenv("PROMPT_THREADS"))
-    {
-        try
-        {
-            auto n = boost::lexical_cast<int>(threads_str);
-            if (n > 0)
+            try
             {
-                cfg.pool.threads = n;
+                auto p = boost::lexical_cast<long>(port_str);
+                if (p >= 0 && p <= 65535)
+                {
+                    cfg.ssh.bind_port = static_cast<std::uint16_t>(p);
+                }
+            }
+            catch (const boost::bad_lexical_cast &)
+            {
             }
         }
-        catch (const boost::bad_lexical_cast &)
-        {
-        }
-    }
 
-    return cfg;
-}
+        if (const char *pub = std::getenv("PROMPT_SSH_HOST_PUBLIC_KEY"))
+        {
+            if (*pub)
+            {
+                cfg.ssh.host_public_key = pub;
+            }
+        }
+
+        if (const char *priv_path = std::getenv("PROMPT_SSH_RSA_HOST_PRIVATE_KEY_PATH"))
+        {
+            if (*priv_path)
+            {
+                cfg.ssh.rsa_host_private_key_path = priv_path;
+            }
+        }
+
+        if (const char *threads_str = std::getenv("PROMPT_THREADS"))
+        {
+            try
+            {
+                auto n = boost::lexical_cast<int>(threads_str);
+                if (n > 0)
+                {
+                    cfg.pool.threads = n;
+                }
+            }
+            catch (const boost::bad_lexical_cast &)
+            {
+            }
+        }
+
+        return cfg;
+    }
+};
+
+ConfigLoader::ConfigLoader() : _impl(std::make_unique<Impl>()) {}
+ConfigLoader::~ConfigLoader() = default;
+AppConfig ConfigLoader::load() { return _impl->load(); }

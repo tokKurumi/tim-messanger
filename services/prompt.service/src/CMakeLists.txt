@@ -8,10 +8,15 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Boost REQUIRED)
 find_package(libssh REQUIRED)
+find_package(spdlog REQUIRED)
 
 add_executable(prompt.service
     main.cpp
     configuration/config.cpp
+    services/executor_service.cpp
+    services/runner_service.cpp
+    services/ssh_listener_service.cpp
+    services/ssh_session.cpp
 )
 
 target_include_directories(prompt.service PUBLIC
@@ -22,4 +27,5 @@ target_include_directories(prompt.service PUBLIC
 target_link_libraries(prompt.service PRIVATE
     boost::boost
     ssh::ssh
+    spdlog::spdlog
 )

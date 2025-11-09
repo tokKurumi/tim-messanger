@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+#include <memory>
 
 struct SshConfig
 {
@@ -36,4 +37,19 @@ struct AppConfig
     ThreadPoolConfig pool;
 };
 
-AppConfig load_config_from_env();
+// Lightweight env config loader class
+class ConfigLoader
+{
+public:
+    ConfigLoader();
+    ~ConfigLoader();
+
+    ConfigLoader(const ConfigLoader &) = delete;
+    ConfigLoader &operator=(const ConfigLoader &) = delete;
+
+    AppConfig load();
+
+private:
+    class Impl;
+    std::unique_ptr<Impl> _impl;
+};
