@@ -100,7 +100,8 @@ fi
 info "Configuring CMake (type=${CMAKE_BUILD_TYPE})..."
 cmake -S "${SRC_DIR}" -B "${BUILD_DIR}" \
   -DCMAKE_TOOLCHAIN_FILE="${TOOLCHAIN_PATH}" \
-  -DCMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
+  -DCMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE}" \
+  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
 # Build the project (compiles sources and links binary)
 info "Building..."
